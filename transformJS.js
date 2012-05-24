@@ -1,7 +1,18 @@
 /* This javascript will apply 3d transforms to css elements*/
 /*The transformer.transform() function is the action part here
   the function call will look like this:
-  transformer.transform([xTranslation, yTranslation, zTranslation],[xRotation, yRotation,zRotation],*/
+  transformer.transform({
+  	translations: [xTranslation, yTranslation, zTranslation],
+  	rotations: [xRotation, yRotation,zRotation],
+  	scales: [xScale, yScale, zScale, vScale],
+  	origins: [xOrigin, yOrigin, zOrigin]
+  	});
+  
+  If an object is missed out then it no transform of that type will be applied
+
+  Translations amounts are in pixels
+  Rotation amounts are in degrees
+  Scales are based on a ratio with 0.5 being half scale, 1 is standard scale 2 being double.*/
 
 var transformer = {
 	xRot: function (angle) {
@@ -50,49 +61,30 @@ var transformer = {
 		matrix[2][3] = z;
 		return matrix;
 	},
-	transform: function (translations, rotations, scales, origins) { //translations in pixels in order [x, y, z] rotations given in degrees in order [xrotation, yrotation, zrotation]
+	transform: function (obj) { //translations in pixels in order [x, y, z] rotations given in degrees in order [xrotation, yrotation, zrotation]
 		"use strict";
-		var xR = rotations[0],
-			yR = rotations[1],
-			zR = rotations[2],
-			xT = translations[0],
-			yT = translations[1],
-			zT = translations[2],
-			xS,
-			yS,
-			zS,
-			tS,
-			xOValue,
-			yOValue,
-			zOValue,
+		var xR = (typeof obj.rotations == "undefined") ? 0 : obj.rotations[0],
+			yR = (typeof obj.rotations == "undefined") ? 0 : obj.rotations[1],
+			zR = (typeof obj.rotations == "undefined") ? 0 : obj.rotations[2],
+			xT = (typeof obj.translations == "undefined") ? 0 : obj.translations[0],
+			yT = (typeof obj.translations == "undefined") ? 0 : obj.translations[1],
+			zT = (typeof obj.translations == "undefined") ? 0 : obj.translations[2],
+			xS = (typeof obj.scales == "undefined") ? 0 : obj.scales[0],
+			yS = (typeof obj.scales == "undefined") ? 0 : obj.scales[1],
+			zS = (typeof obj.scales == "undefined") ? 0 : obj.scales[2],
+			vS = 1,
+			xOrigin = (typeof obj.origins == "undefined") ? 0 : obj.origins[0],
+			yOrigin = (typeof obj.origins == "undefined") ? 0 : obj.origins[1],
+			zOrigin = (typeof obj.origins == "undefined") ? 0 : obj.origins[2],
 			translateMatrix,
 			scaleMatrix,
 			combinedMatrix,
 			cssText;
-
-		if (!scales) {
-			xS = 1;
-			yS = 1;
-			zS = 1;
-			tS = 1;
-		} else {
-			xS = scales[0];
-			yS = scales[1];
-			zS = scales[2];
-			tS = 1; //chances of wanting this as anything other than 1 are very slim
+		
+		if(obj.scales) {
+			vS = (typeof obj.scales[3] == "undefined") ? 1 : obj.scales[3];
 		}
-
-		if (!origins) {
-			xOValue = 0;
-			yOValue = 0;
-			zOValue = 0;
-		} else {
-			xOValue = origins[0];
-			yOValue = origins[1];
-			zOValue = origins[2];
-		}
-	
-		scaleMatrix = Matrix.create([[xS, 0, 0, 0], [0, yS, 0, 0], [0, 0, zS, 0], [0, 0, 0, 1]]); //set scalar quantities
+		scaleMatrix = Matrix.create([[xS, 0, 0, 0], [0, yS, 0, 0], [0, 0, zS, 0], [0, 0, 0, vS]]); //set scalar quantities
 		//set matrices to matrix objects for use by sylvester.js
 		xR = Matrix.create(transformer.xRot(xR));
 		yR = Matrix.create(transformer.yRot(yR));
