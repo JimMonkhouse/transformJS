@@ -1,20 +1,64 @@
+/*The setup part of transform is used to set up a space for 2d or 3d transforms using CSS.
+You can add any property in to the object argument of the function that is a valid CSS 
+style in camelCase javascript. 
+
+If no height or width are given the perspectiveprovider will ingerit the width and size of the
+div element provided as the first argument All other properties will inherit the default value.
+
+transform.setup("HTMLDivElement", {
+	perspective: "800px",
+	perspectiveOrigin: "50px,50px" // can be in either px or %
+})*/
+
 /* This javascript will apply 3d transforms to css elements*/
-/*The transformer.transform() function is the action part here
+/*The transform.transform() function is the action part here
   the function call will look like this:
-  transformer.transform({
-  	translations: [xTranslation, yTranslation, zTranslation],
-  	rotations: [xRotation, yRotation,zRotation],
-  	scales: [xScale, yScale, zScale, vScale],
+  transform.transform({
+  	translations: [xTranslation, yTranslation, zTranslation], (integers in pixels)
+  	rotations: [xRotation, yRotation,zRotation], (integers or non-integers in degrees)
+  	scales: [xScale, yScale, zScale, vScale], (ratio scales with 1 being 100% - Vscale is not necessary and if the same vScale is entered as others it will appear as if no scaling has occurred)
   	origins: [xOrigin, yOrigin, zOrigin]
   	});
   
-  If an object is missed out then it no transform of that type will be applied
+  If an transform type is omitted then no transform of that type will be applied*/
 
-  Translations amounts are in pixels
-  Rotation amounts are in degrees
-  Scales are based on a ratio with 0.5 being half scale, 1 is standard scale 2 being double.*/
+var transform = {
+	setup: function(el, obj){
+		var div = document.getElementById(el),
+		persProv = document.createElement('div'),
+		cssText = "";
 
-var transformer = {
+		persProv.id = el + 'perspective';
+		persProv.style.height = obj.height||div.offsetHeight + 'px';
+		persProv.style.width = obj.width||div.offsetWidth + 'px';
+		persProv.style.position = "absolute";
+		persProv.style.left = obj.left||div.offsetLeft +'px';
+		persProv.style.top = obj.height||div.offsetTop + 'px';
+		div.style.left = 0;
+		div.style.top = 0;
+
+		if (obj) {
+			if (obj.perspective) {
+				persProv.style.webkitPerspective = obj.perspective;
+				persProv.style.mozPerspective = obj.perspective;
+				persProv.style.oPerspective = obj.perspective;
+				persProv.style.perspective = obj.perspective;
+			} else {
+				persProv.style.webkitPerspective = '800px';
+				persProv.style.mozPerspective = '800px';
+				persProv.style.oPerspective = '800px';
+				persProv.style.perspective = '800px';
+			}
+			if (obj.perspectiveOrigin)
+				persProv.style.webkitPerspectiveOrigin = obj.perspectiveOrigin;
+				persProv.style.mozPerspectiveOrigin = obj.perspectiveOrigin;
+				persProv.style.oPerspectiveOrigin = obj.perspectiveOrigin;
+				persProv.style.perspectiveOrigin = obj.perspectiveOrigin;
+		}
+
+		persProv.appendChild((div.cloneNode(true)));
+		div.parentNode.replaceChild(persProv, div);
+	},
 	xRot: function (angle) {
 		"use strict";
 		var x = angle * (Math.PI / 180),
@@ -69,9 +113,9 @@ var transformer = {
 			xT = (typeof obj.translations == "undefined") ? 0 : obj.translations[0],
 			yT = (typeof obj.translations == "undefined") ? 0 : obj.translations[1],
 			zT = (typeof obj.translations == "undefined") ? 0 : obj.translations[2],
-			xS = (typeof obj.scales == "undefined") ? 0 : obj.scales[0],
-			yS = (typeof obj.scales == "undefined") ? 0 : obj.scales[1],
-			zS = (typeof obj.scales == "undefined") ? 0 : obj.scales[2],
+			xS = (typeof obj.scales == "undefined") ? 1 : obj.scales[0],
+			yS = (typeof obj.scales == "undefined") ? 1 : obj.scales[1],
+			zS = (typeof obj.scales == "undefined") ? 1 : obj.scales[2],
 			vS = 1,
 			xOrigin = (typeof obj.origins == "undefined") ? 0 : obj.origins[0],
 			yOrigin = (typeof obj.origins == "undefined") ? 0 : obj.origins[1],
@@ -86,12 +130,13 @@ var transformer = {
 		}
 		scaleMatrix = Matrix.create([[xS, 0, 0, 0], [0, yS, 0, 0], [0, 0, zS, 0], [0, 0, 0, vS]]); //set scalar quantities
 		//set matrices to matrix objects for use by sylvester.js
-		xR = Matrix.create(transformer.xRot(xR));
-		yR = Matrix.create(transformer.yRot(yR));
-		zR = Matrix.create(transformer.zRot(zR));
-		translateMatrix = Matrix.create(transformer.translate(xT, yT, zT));
+		xR = Matrix.create(transform.xRot(xR));
+		yR = Matrix.create(transform.yRot(yR));
+		zR = Matrix.create(transform.zRot(zR));
+		translateMatrix = Matrix.create(transform.translate(xT, yT, zT));
 		//multiply matrices
 		combinedMatrix = xR.x(yR).x(zR).x(scaleMatrix).x(translateMatrix);
+		//combinedMatrix = this.multiplyMatrices()
 		//write output
 		cssText	= this.writeMatrix(combinedMatrix);
 		return cssText;
@@ -123,4 +168,20 @@ var transformer = {
 		output = "matrix3d(" + arr + ")";
 		return output;
 	}
+	/* For later implementation if sylvester is removed?
+	multiplyMatrices: function(xRot, yRot, zRot) {
+		var newMatrix = [[1,0,0,0],[0,1,0,0,],[0,0,1,0],[0,0,0,1]],
+		midMatrix = [[1,0,0,0],[0,1,0,0,],[0,0,1,0],[0,0,0,1]];
+		for(i = 0; i < 3; i++){/*
+ 			midMatrix[i][0] = xRot[i][0] * yRot[0][0] + xRot[i][1] * yRot[1][0] + xRot[i][2] * yRot[2][0];
+ 			midMatrix[i][1] = xRot[i][0] * yRot[0][1] + xRot[i][1] * yRot[1][1] + xRot[i][2] * yRot[2][1];
+			midMatrix[i][2] = xRot[i][0] * yRot[0][2] + xRot[i][1] * yRot[1][2] + xRot[i][2] * yRot[2][2];
+		}
+		for(i = 0; i < 3; i++){
+ 			newMatrix[i][0] = midMatrix[i][0] * zRot[0][0] + midMatrix[i][1] * zRot[1][0] + midMatrix[i][2] * zRot[2][0];
+ 			newMatrix[i][1] = midMatrix[i][0] * zRot[0][1] + midMatrix[i][1] * zRot[1][1] + midMatrix[i][2] * zRot[2][1];
+			newMatrix[i][2] = midMatrix[i][0] * zRot[0][2] + midMatrix[i][1] * zRot[1][2] + midMatrix[i][2] * zRot[2][2];
+		}
+		return newMatrix;
+	}*/
 }
