@@ -40,7 +40,7 @@ e.g.
 CSS Selector = -webkit-transition-timing-function: linear;
 Object Equivalent = webkitTransitionTimingFunction: 'linear'
 
-The setup method will copy the HTML element(s) children and place all this within a wrapper inside the HTML element. This can then have the transform method applied to it which will affect anything inside the give HTML element.
+The setup method will copy the HTML element(s) children and place all this within a wrapper inside the HTML element. If the CSS selector used was .someClass the inner wrapper would be .someClassTransformer The .transform method can then be called on the variable used in the setup function and this will apply the transformation to the inner div (.someClassTransformer) created during the setup method. If you have applied any "transition" CSS properties to make your transformations nice and smooth these will be applied to the inner divs also so that the transition effects will be maintained.
 
 If an object is passed as an argument the script will then create a container around the div element that will provide perspective for 3D transformations. 
 

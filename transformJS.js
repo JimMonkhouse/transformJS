@@ -8,11 +8,12 @@ var transform = {
 		i, j;
 
 		for (var j = div.length - 1; j >= 0; j--) {
+			if(div[j].querySelectorAll(el+'Transformer').length > 0) {continue;};
 			divInner = div[j].cloneNode(true);
 			if (/\./.test(el)) 
-				divInner.className = el.replace(/\./, "") + 'inner';
+				divInner.className = el.replace(/\./, "") + 'Transformer';
 			else if (/#/.test(el))
-				divInner.id = el.replace(/#/, '') + 'inner';
+				divInner.id = el.replace(/#/, '') + 'Transformer';
 			divInner.style.height = obj.height||div[j].offsetHeight + 'px';
 			divInner.style.width = obj.width||div[j].offsetWidth + 'px';
 			divInner.style.left = obj.left||div[j].offsetLeft +'px';
@@ -52,13 +53,22 @@ var transform = {
 					div[j].style.perspective = '800px';
 				}
 			}
+			for(i in window.getComputedStyle(div[j])) {
+				switch(true) {
+					case (/transition/i.test(i) && window.getComputedStyle(div[j])[i] != ""):
+						divInner.style[i] = window.getComputedStyle(div[j])[i];
+						break;
+					default:
+					break;
+				}
+			}
 			div[j].innerHTML = "";
 			div[j].appendChild(divInner);
 		};
 
 		NodeList.prototype.transform = transform.transform;
 		HTMLElement.prototype.transform = transform.transform;
-		div = document.querySelectorAll(el+'inner');
+		div = document.querySelectorAll(el+'Transformer');
 		return div;
 	},
 	xRot: function (angle) {
