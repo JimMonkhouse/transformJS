@@ -1,63 +1,65 @@
-/*The setup part of transform is used to set up a space for 2d or 3d transforms using CSS.
-You can add any property in to the object argument of the function that is a valid CSS 
-style in camelCase javascript. 
-
-If no height or width are given the perspectiveprovider will ingerit the width and size of the
-div element provided as the first argument All other properties will inherit the default value.
-
-transform.setup("HTMLDivElement", {
-	perspective: "800px",
-	perspectiveOrigin: "50px,50px" // can be in either px or %
-})*/
-
-/* This javascript will apply 3d transforms to css elements*/
-/*The transform.transform() function is the action part here
-  the function call will look like this:
-  transform.transform({
-  	translations: [xTranslation, yTranslation, zTranslation], (integers in pixels)
-  	rotations: [xRotation, yRotation,zRotation], (integers or non-integers in degrees)
-  	scales: [xScale, yScale, zScale, vScale], (ratio scales with 1 being 100% - Vscale is not necessary and if the same vScale is entered as others it will appear as if no scaling has occurred)
-  	origins: [xOrigin, yOrigin, zOrigin]
-  	});
-  
-  If an transform type is omitted then no transform of that type will be applied*/
-
 var transform = {
 	setup: function(el, obj){
-		var div = document.getElementById(el),
-		persProv = document.createElement('div'),
-		cssText = "";
+		var div = document.querySelectorAll(el),
+		divInner = "new div element",
+		cssText = "",
+		objPerspective = true,
+		obj = typeof obj == "undefined" ? {} : obj,
+		i, j;
 
-		persProv.id = el + 'perspective';
-		persProv.style.height = obj.height||div.offsetHeight + 'px';
-		persProv.style.width = obj.width||div.offsetWidth + 'px';
-		persProv.style.position = "absolute";
-		persProv.style.left = obj.left||div.offsetLeft +'px';
-		persProv.style.top = obj.height||div.offsetTop + 'px';
-		div.style.left = 0;
-		div.style.top = 0;
+		for (var j = div.length - 1; j >= 0; j--) {
+			divInner = div[j].cloneNode(true);
+			if (/\./.test(el)) 
+				divInner.className = el.replace(/\./, "") + 'inner';
+			else if (/#/.test(el))
+				divInner.id = el.replace(/#/, '') + 'inner';
+			divInner.style.height = obj.height||div[j].offsetHeight + 'px';
+			divInner.style.width = obj.width||div[j].offsetWidth + 'px';
+			divInner.style.left = obj.left||div[j].offsetLeft +'px';
+			divInner.style.top = obj.height||div[j].offsetTop + 'px';
+			div[j].style.webkitTransformStyle = "preserve-3d";
+			div[j].style.mozTransformStyle = "preserve-3d";
+			div[j].style.oTransformStyle = "preserve-3d";
+			div[j].style.transformStyle = "preserve-3d";
 
-		if (obj) {
-			if (obj.perspective) {
-				persProv.style.webkitPerspective = obj.perspective;
-				persProv.style.mozPerspective = obj.perspective;
-				persProv.style.oPerspective = obj.perspective;
-				persProv.style.perspective = obj.perspective;
-			} else {
-				persProv.style.webkitPerspective = '800px';
-				persProv.style.mozPerspective = '800px';
-				persProv.style.oPerspective = '800px';
-				persProv.style.perspective = '800px';
+			if (obj) {
+				for(i in obj) {
+					if(!obj.hasOwnProperty(i)){continue;};
+					if(/(height|width|left|top)/.test(i)){continue;};
+					switch(i) {
+						case 'perspective':
+							div[j].style.webkitPerspective = obj.perspective;
+							div[j].style.mozPerspective = obj.perspective;
+							div[j].style.oPerspective = obj.perspective;
+							div[j].style.perspective = obj.perspective;
+							objPerspective = true;
+							break;
+						case 'perspectiveOrigin':
+							div[j].style.webkitPerspectiveOrigin = obj.perspectiveOrigin;
+							div[j].style.mozPerspectiveOrigin = obj.perspectiveOrigin;
+							div[j].style.oPerspectiveOrigin = obj.perspectiveOrigin;
+							div[j].style.perspectiveOrigin = obj.perspectiveOrigin;
+							break;
+						default:
+							div[j].style[i] = obj[i];
+							break;
+					}
+				}
+				if (!objPerspective) {
+					div[j].style.webkitPerspective = '800px';
+					div[j].style.mozPerspective = '800px';
+					div[j].style.oPerspective = '800px';
+					div[j].style.perspective = '800px';
+				}
 			}
-			if (obj.perspectiveOrigin)
-				persProv.style.webkitPerspectiveOrigin = obj.perspectiveOrigin;
-				persProv.style.mozPerspectiveOrigin = obj.perspectiveOrigin;
-				persProv.style.oPerspectiveOrigin = obj.perspectiveOrigin;
-				persProv.style.perspectiveOrigin = obj.perspectiveOrigin;
-		}
+			div[j].innerHTML = "";
+			div[j].appendChild(divInner);
+		};
 
-		persProv.appendChild((div.cloneNode(true)));
-		div.parentNode.replaceChild(persProv, div);
+		NodeList.prototype.transform = transform.transform;
+		HTMLElement.prototype.transform = transform.transform;
+		div = document.querySelectorAll(el+'inner');
+		return div;
 	},
 	xRot: function (angle) {
 		"use strict";
@@ -105,25 +107,29 @@ var transform = {
 		matrix[2][3] = z;
 		return matrix;
 	},
-	transform: function (obj) { //translations in pixels in order [x, y, z] rotations given in degrees in order [xrotation, yrotation, zrotation]
+	transform: function (obj) {
 		"use strict";
-		var xR = (typeof obj.rotations == "undefined") ? 0 : obj.rotations[0],
-			yR = (typeof obj.rotations == "undefined") ? 0 : obj.rotations[1],
-			zR = (typeof obj.rotations == "undefined") ? 0 : obj.rotations[2],
-			xT = (typeof obj.translations == "undefined") ? 0 : obj.translations[0],
-			yT = (typeof obj.translations == "undefined") ? 0 : obj.translations[1],
-			zT = (typeof obj.translations == "undefined") ? 0 : obj.translations[2],
-			xS = (typeof obj.scales == "undefined") ? 1 : obj.scales[0],
-			yS = (typeof obj.scales == "undefined") ? 1 : obj.scales[1],
-			zS = (typeof obj.scales == "undefined") ? 1 : obj.scales[2],
+		var obj = (typeof obj == "undefined") ? {} : obj,
+			xR = (typeof obj.rotation == "undefined") ? 0 : obj.rotation[0],
+			yR = (typeof obj.rotation == "undefined") ? 0 : obj.rotation[1],
+			zR = (typeof obj.rotation == "undefined") ? 0 : obj.rotation[2],
+			xT = (typeof obj.translation == "undefined") ? 0 : obj.translation[0],
+			yT = (typeof obj.translation == "undefined") ? 0 : obj.translation[1],
+			zT = (typeof obj.translation == "undefined") ? 0 : obj.translation[2],
+			xS = (typeof obj.scale == "undefined") ? 1 : obj.scale[0],
+			yS = (typeof obj.scale == "undefined") ? 1 : obj.scale[1],
+			zS = (typeof obj.scale == "undefined") ? 1 : obj.scale[2],
 			vS = 1,
-			xOrigin = (typeof obj.origins == "undefined") ? 0 : obj.origins[0],
-			yOrigin = (typeof obj.origins == "undefined") ? 0 : obj.origins[1],
-			zOrigin = (typeof obj.origins == "undefined") ? 0 : obj.origins[2],
+			xOrigin = (typeof obj.origin == "undefined") ? 0 : obj.origin[0],
+			yOrigin = (typeof obj.origin == "undefined") ? 0 : obj.origin[1],
+			zOrigin = (typeof obj.origin == "undefined") ? 0 : obj.origin[2],
 			translateMatrix,
 			scaleMatrix,
 			combinedMatrix,
-			cssText;
+			originMatrix,
+			cssText,
+			browser = window.navigator.userAgent,
+			i;
 		
 		if(obj.scales) {
 			vS = (typeof obj.scales[3] == "undefined") ? 1 : obj.scales[3];
@@ -134,12 +140,29 @@ var transform = {
 		yR = Matrix.create(transform.yRot(yR));
 		zR = Matrix.create(transform.zRot(zR));
 		translateMatrix = Matrix.create(transform.translate(xT, yT, zT));
+		originMatrix = Matrix.create([[1,0,0,xOrigin],[0,1,0,yOrigin],[0,0,1,zOrigin],[0,0,0,1]]);
 		//multiply matrices
-		combinedMatrix = xR.x(yR).x(zR).x(scaleMatrix).x(translateMatrix);
+		combinedMatrix = xR.x(yR).x(zR).x(scaleMatrix).x(translateMatrix).x(originMatrix);
 		//combinedMatrix = this.multiplyMatrices()
 		//write output
-		cssText	= this.writeMatrix(combinedMatrix);
-		return cssText;
+		cssText	= transform.writeMatrix(combinedMatrix);
+		//return cssText;
+
+		if(this.length) {
+			for(i = this.length - 1; i >= 0; i--) {
+				this[i].style.webkitTransform = cssText;
+				this[i].style.mozTransform = cssText;
+				this[i].style.oTransform = cssText;
+				this[i].style.msTransform = cssText;
+				this[i].style.transform = cssText;
+			}
+		} else {
+			this.style.webkitTransform = cssText;
+			this.style.mozTransform = cssText;
+			this.style.oTransform = cssText;
+			this.style.msTransform = cssText;
+			this.style.transform = cssText;
+		}
 	},
 	writeMatrix: function (matrix) {
 		"use strict";
