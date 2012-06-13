@@ -15,14 +15,14 @@ transform.setup() is an optional method of transform.js It will create a simple 
 
 In order to setup a 3d space you must have an html page with at least 1 div present. The setup method is then called like this:  
 
-var myVar = transform.setup("selector", {
-	perspective: '800px',
-	perspectiveOrigin: '50%,50%',
-	left: '200px',
-	top: '100px',
-	width: '600px',
-	height: '400px'
-});
+>var myVar = transform.setup("selector", {
+>	perspective: '800px',
+>	perspectiveOrigin: '50%,50%',
+>	left: '200px',
+>	top: '100px',
+>	width: '600px',
+>	height: '400px'
+>});
 
 The selector is the only mandatory argument for the function call the object is optional. 
 
@@ -34,13 +34,13 @@ The selector users document.querySelectorAll which means two things
 
 If no object is passed it will only be possible to perform 2D transforms: Any attempted 3d transforms will work but have no depth to them, so rotating a div in the x or y axis for example would not cause the side that moves further away to get smaller and the near side to get larger. It is possible to pass an empty object here {} and the perspective and perspectiveOrigin values will default to the values given above. The other properties (left, top etc) will inherit the same values as the div element passed in the first argument if they are not declared in the object.
 
-It is possible to pass any CSS selector in via the object to style the containing div as long as they are camel cased in instances which contain dashes '-'. perspective and perspectiveOrigin do not need any vendor prefix as they are automatically added in the script. All other CSS selectors which currently require a vendor prefix need to be given one. 
+It is possible to pass any CSS property in via the object to style the containing div as long as they are camel cased in instances which contain dashes '-'. perspective and perspectiveOrigin do not need any vendor prefix as they are automatically added in the script. All other CSS selectors which currently require a vendor prefix need to be given one. 
 
 e.g. 
 CSS Selector = -webkit-transition-timing-function: linear;
-Object Equivalent = webkitTransitionTimingFunction: 'linear'
+Object Equivalent = webkitTransitionTimingFunction = 'linear'
 
-The setup method will copy the HTML element(s) children and place all this within a wrapper inside the HTML element. If the CSS selector used was .someClass the inner wrapper would be .someClassTransformer The .transform method can then be called on the variable used in the setup function and this will apply the transformation to the inner div (.someClassTransformer) created during the setup method. If you have applied any "transition" CSS properties to make your transformations nice and smooth these will be applied to the inner divs also so that the transition effects will be maintained.
+The setup method will copy the HTML element(s) children and place all this within a wrapper inside the HTML element. If the CSS selector used was .someClass the inner wrapper would be .someClassTransformer The .transform method can then be called on the variable used in the setup function and this will apply the transformation to the inner div (.someClassTransformer) created during the setup method. If you have applied any "transition" CSS properties to make your transformations nice and smooth these will be applied to the inner div also so that the transition effects will be maintained.
 
 If an object is passed as an argument the script will then create a container around the div element that will provide perspective for 3D transformations. 
 
@@ -50,16 +50,18 @@ On completion of the setup method the 'transform' prototype is added to the HTML
 
 >1. It makes it super easy to do your transformations.
 >
->2. It doesn't work in older browsers (yet).
+>2. It doesn't work in older browsers (yet) unless you call transform.transform(x) where x is the variable originally used for setup or a document.getElementBy.... etc.
 
-How to do the super easy transformations you may ask? Well it goes a little something like this.
+If you then try to call setup again on the same element the inner wrapper wil not be created but the values for perspective, width, height, left, top and all transition properties will be refreshed.
 
-myDiv.transform({
-	rotation: [x,y,z],          
-	translation:[x,y,z],		
-	scale: [x,y,z],				
-	origin: [x,y,z]
-});
+To apply a transform to your newly setup space (or to your own html elements if you setup your space independently of the setup function in transformJS) the function call will look like this:
+
+>myDiv.transform({
+>	rotation: [x,y,z],          
+>	translation:[x,y,z],		
+>	scale: [x,y,z],				
+>	origin: [x,y,z]
+>});
 
 All properties in this function call are optional. If nothing is passed as an argument the HTML element will return to an untransformed state.
 

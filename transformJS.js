@@ -7,13 +7,63 @@ var transform = {
 		obj = typeof obj == "undefined" ? {} : obj,
 		i, j;
 
+		if(arguments.length == 0) {
+			NodeList.prototype.transform = transform.transform;
+			HTMLElement.prototype.transform = transform.transform;
+			return;
+		}
+
 		for (var j = div.length - 1; j >= 0; j--) {
-			if(div[j].querySelectorAll(el+'Transformer').length > 0) {continue;};
+			if(div[j].querySelectorAll(el+'Transformer').length > 0) {
+				if (obj) {
+					for(i in obj) {
+						if(!obj.hasOwnProperty(i)){continue;};
+						if(/(height|width|left|top)/.test(i)){continue;};
+						switch(i) {
+							case 'perspective':
+								div[j].style.webkitPerspective = obj.perspective;
+								div[j].style.mozPerspective = obj.perspective;
+								div[j].style.oPerspective = obj.perspective;
+								div[j].style.perspective = obj.perspective;
+								objPerspective = true;
+								break;
+							case 'perspectiveOrigin':
+								div[j].style.webkitPerspectiveOrigin = obj.perspectiveOrigin;
+								div[j].style.mozPerspectiveOrigin = obj.perspectiveOrigin;
+								div[j].style.oPerspectiveOrigin = obj.perspectiveOrigin;
+								div[j].style.perspectiveOrigin = obj.perspectiveOrigin;
+								break;
+							default:
+								div[j].style[i] = obj[i];
+								break;
+						}
+					}
+					if (!objPerspective) {
+						div[j].style.webkitPerspective = '800px';
+						div[j].style.mozPerspective = '800px';
+						div[j].style.oPerspective = '800px';
+						div[j].style.perspective = '800px';
+					}
+				}
+				for(i in window.getComputedStyle(div[j])) {
+					divInner = div[j].firstElementChild;
+					switch(true) {
+						case (/transition/i.test(i) && window.getComputedStyle(div[j])[i] != ""):
+							divInner.style[i] = window.getComputedStyle(div[j])[i];
+							break;
+						default:
+						break;
+					}
+				}
+				continue;
+			};
 			divInner = div[j].cloneNode(true);
 			if (/\./.test(el)) 
 				divInner.className = el.replace(/\./, "") + 'Transformer';
 			else if (/#/.test(el))
 				divInner.id = el.replace(/#/, '') + 'Transformer';
+			else
+				continue;
 			divInner.style.height = obj.height||div[j].offsetHeight + 'px';
 			divInner.style.width = obj.width||div[j].offsetWidth + 'px';
 			divInner.style.left = obj.left||div[j].offsetLeft +'px';
