@@ -62,8 +62,11 @@ myDiv.transform({
 });
 
 All properties in this function call are optional. If nothing is passed as an argument the HTML element will return to an untransformed state.
+
 >Rotations can be given in integers or floating point numbers (value in degrees) 
+>
 >Translations values are given in integers in pixel amounts
+>
 >Scale values are given in floating point or integer values a ratio of the current size where 0 = 0% of size 1= 100%, 2=200% etc. Their is another scale that can be added in the scales argument e.g. scale: [x,y,z,v]. the V effectively scales the viewpoint. If this is entered and has the same value as x,y,z it will appear as though no scaling has occured. If you wish to use the V to scale your transforms the other values should be entered as a 1 i.e. scale: [1,1,1,1.3] to zoom x 1.3.
 
 The transform method can be used two different ways. If you have used the transform.setup method:
