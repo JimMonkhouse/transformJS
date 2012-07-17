@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>3d CSS Form - create 3d space for your ad</title>
+	<style>
+	#basicFormHolder {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 335px;
+		height: 100%;
+	}
+
+	#output {
+		position: absolute;
+		left: 335px;
+		top: 80px;
+		width: 800px;
+		height: 100%;
+	}
+
+	#controls {
+		position: absolute;
+		left: 335px;
+		bottom: 0;
+		width: 500px;
+		opacity: 0;
+		-webkit-transition-duration: 1s;
+		-moz-transition-duration: 1s;
+		-ms-transition-duration: 1s;
+		-o-transition-duration: 1s;
+		transition-duration: 1s;
+	}
+
+	#trapezoid {
+		border-bottom: 100px solid red;
+		border-left: 50px solid transparent;
+		border-right: 50px solid transparent;
+		height: 0;
+		width: 100px;
+	}
+
+	#addElements {
+		position: absolute;
+		left: 0;
+		top: 155px;
+		width: 335px;
+	}
+
+	#addDiv {
+		position: absolute;
+		left: 20px;
+		top: 10px;
+		width: 60px;
+		height: 60px;
+		border-radius: 10px;
+		background-image: url('../images/addDiv.png');
+		cursor: pointer;
+	}
+
+	#addText {
+		position: absolute;
+		left: 100px;
+		top: 10px;
+		width: 60px;
+		height: 60px;
+		border-radius: 10px;
+		background-image: url('../images/addText.png');
+		cursor: pointer;
+	}
+
+	#addImg {
+		position: absolute;
+		left: 180px;
+		top: 10px;
+		width: 60px;
+		height: 60px;
+		border-radius: 10px;
+		background-image: url('../images/addImg.png');
+		cursor: pointer;
+	}
+	</style>
+</head>
+<body>
+<script src="../js/sylvester.js"></script>
+<script src="../js/transformJS.js"></script>
+<div id="basicFormHolder">
+	<form>
+		<div id="basics">
+			<div title="please enter the width and height of your ad in pixels">
+				<input type="text" id="width" width="6" placeholder="Width" /> x <input type="text" id="height"width="6" placeholder="height" />
+			</div>
+			<div title="Check this box if you want to use 3D CSS tweens in your ad">
+				<input type="checkbox" value="3d" id="threeD" />3D space?
+			</div>
+		</div>
+		<div id="threeDOptions">
+			<div title="Enter the perspective for the 3D section - a higher number creates a less intense effect - as though viewing the transformation from further away recommend 800px as a good start point">
+				<input type="text" id="perspective" width="6" placeholder="Perspective" />
+			</div>
+			<div title="Enter the origin for the perspective. This is set to 50% x 50% by default - as though viewing the ad from the centre of the space. This value can be given in percent or pixels">
+				<input type="text" id="perspectiveOriginX" width="6" value="50" /> x 
+				<input type="text" id="perspectiveOriginY" width="6" value="50" /> 
+				<br>
+				<input type="radio" name="originType" value="px" id="originPixels" /> Pixels &nbsp;&nbsp;&nbsp;&nbsp; <input type="radio" name="originType" value="%" id="originPercent" checked /> Percent
+			</div>
+		</div>
+		<input type="button" onclick="setup()" value="Create"/>
+	</form>
+</div>
+<div id="addElements">
+	<div id="addDiv" title="Add a container">
+	</div>
+	<div id="addText" title="Add Text">
+	</div>
+	<div id="addImg" title="Add Image">
+	</div>
+</div>
+
+<div id="output">
+</div>
+
+<div id="controls">
+	<form>
+		<div id="rotations">
+			<input type="text" class="rotation" id="rotX" placeholder="X rotation (degrees)" />
+			<input type="text" class="rotation" id="rotY" placeholder="Y rotation (degrees)" />
+			<input type="text" class="rotation" id="rotZ" placeholder="Z rotation (degrees)" />
+		</div>
+		<div id="translations">
+			<input type="text" class="translation" id="tranX" placeholder="X translation (pixels)" />
+			<input type="text" class="translation" id="tranY" placeholder="Y translation (pixels)" />
+			<input type="text" class="translation" id="tranZ" placeholder="Z translation (pixels)" />
+		</div>
+		<div id="scales">
+			<input type="text" class="scale" id="scaleX" placeholder="X scale (ratio)" />
+			<input type="text" class="scale" id="scaleY" placeholder="Y scale (ratio)" />
+			<input type="text" class="scale" id="scaleZ" placeholder="Z scale (ratio)" />
+		</div>
+		<div id="scales">
+			<input type="text" class="origin" id="originX" placeholder="X origin (ratio - maybe?)" />
+			<input type="text" class="origin" id="originY" placeholder="Y origin (ratio - maybe?)" />
+			<input type="text" class="origin" id="originZ" placeholder="Z origin (ratio - maybe?)" />
+		</div>
+		<input type="button" value="Transform" onclick="change(document.getElementById('adInner'))" />
+	</form>
+</div>
+
+<script>
+function change(el) {
+	transform.formTransform(el)
+}
+function setup() {
+	transform.formSetup();
+}
+
+_joesGlobal.addListener = function(type, el, callBack) {
+	if(document.addEventListener) {
+		document.querySelector(el).addEventListener(type, callBack);
+	} else {
+		document.querySelector(el).attachEvent("on" + type, callBack);
+	}
+};
+</script>
+</body>
+</html>

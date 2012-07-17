@@ -4,21 +4,21 @@ var transform = {
 		divInner = "new div element",
 		cssText = "",
 		objPerspective = true,
-		obj = typeof obj == "undefined" ? {} : obj,
 		i, j;
+		obj = typeof obj == "undefined" ? {} : obj;
 
-		if(arguments.length == 0) {
+		if(arguments.length === 0) {
 			NodeList.prototype.transform = transform.transform;
 			HTMLElement.prototype.transform = transform.transform;
 			return;
 		}
 
-		for (var j = div.length - 1; j >= 0; j--) {
+		for (j = div.length - 1; j >= 0; j--) {
 			if(div[j].querySelectorAll(el+'Transformer').length > 0) {
 				if (obj) {
 					for(i in obj) {
-						if(!obj.hasOwnProperty(i)){continue;};
-						if(/(height|width|left|top)/.test(i)){continue;};
+						if(!obj.hasOwnProperty(i)){continue;}
+						if(/(height|width|left|top)/.test(i)){continue;}
 						switch(i) {
 							case 'perspective':
 								div[j].style.webkitPerspective = obj.perspective;
@@ -47,18 +47,14 @@ var transform = {
 				}
 				for(i in window.getComputedStyle(div[j])) {
 					divInner = div[j].firstElementChild;
-					switch(true) {
-						case (/transition/i.test(i) && window.getComputedStyle(div[j])[i] != ""):
-							divInner.style[i] = window.getComputedStyle(div[j])[i];
-							break;
-						default:
-						break;
+					if (/transition/i.test(i) && window.getComputedStyle(div[j])[i] !== "") {
+						divInner.style[i] = window.getComputedStyle(div[j])[i];
 					}
 				}
 				continue;
-			};
+			}
 			divInner = div[j].cloneNode(true);
-			if (/\./.test(el)) 
+			if (/\./.test(el))
 				divInner.className = el.replace(/\./, "") + 'Transformer';
 			else if (/#/.test(el))
 				divInner.id = el.replace(/#/, '') + 'Transformer';
@@ -75,8 +71,8 @@ var transform = {
 
 			if (obj) {
 				for(i in obj) {
-					if(!obj.hasOwnProperty(i)){continue;};
-					if(/(height|width|left|top)/.test(i)){continue;};
+					if(!obj.hasOwnProperty(i)){continue;}
+					if(/(height|width|left|top)/.test(i)){continue;}
 					switch(i) {
 						case 'perspective':
 							div[j].style.webkitPerspective = obj.perspective;
@@ -104,17 +100,13 @@ var transform = {
 				}
 			}
 			for(i in window.getComputedStyle(div[j])) {
-				switch(true) {
-					case (/transition/i.test(i) && window.getComputedStyle(div[j])[i] != ""):
-						divInner.style[i] = window.getComputedStyle(div[j])[i];
-						break;
-					default:
-					break;
+				if (/transition/i.test(i) && window.getComputedStyle(div[j])[i] !== "") {
+					divInner.style[i] = window.getComputedStyle(div[j])[i];
 				}
 			}
 			div[j].innerHTML = "";
 			div[j].appendChild(divInner);
-		};
+		}
 
 		NodeList.prototype.transform = transform.transform;
 		HTMLElement.prototype.transform = transform.transform;
@@ -169,8 +161,8 @@ var transform = {
 	},
 	transform: function (obj) {
 		"use strict";
-		var obj = (typeof obj == "undefined") ? {} : obj,
-			xR = (typeof obj.rotation == "undefined") ? 0 : obj.rotation[0],
+		obj = (typeof obj == "undefined") ? {} : obj;
+		var xR = (typeof obj.rotation == "undefined") ? 0 : obj.rotation[0],
 			yR = (typeof obj.rotation == "undefined") ? 0 : obj.rotation[1],
 			zR = (typeof obj.rotation == "undefined") ? 0 : obj.rotation[2],
 			xT = (typeof obj.translation == "undefined") ? 0 : obj.translation[0],
@@ -226,13 +218,13 @@ var transform = {
 	},
 	writeMatrix: function (matrix) {
 		"use strict";
-		var i, j, z, output, 
+		var i, j, z, output,
 		count = 0,
 		arr = [];
 
 		if (!matrix.length) {
 			for(i in matrix) {
-				if(!matrix.hasOwnProperty(i)){continue}
+				if(!matrix.hasOwnProperty(i)){continue;}
 				for(j = 0; j < matrix[i].length; j++) {
 					for(z = 0; z < matrix[i][j].length; z++) {
 						arr[count] = (matrix[i][j][z]).toFixed(20);
@@ -255,14 +247,14 @@ var transform = {
 	multiplyMatrices: function(xRot, yRot, zRot) {
 		var newMatrix = [[1,0,0,0],[0,1,0,0,],[0,0,1,0],[0,0,0,1]],
 		midMatrix = [[1,0,0,0],[0,1,0,0,],[0,0,1,0],[0,0,0,1]];
-		for(i = 0; i < 3; i++){/*
- 			midMatrix[i][0] = xRot[i][0] * yRot[0][0] + xRot[i][1] * yRot[1][0] + xRot[i][2] * yRot[2][0];
- 			midMatrix[i][1] = xRot[i][0] * yRot[0][1] + xRot[i][1] * yRot[1][1] + xRot[i][2] * yRot[2][1];
+		for(i = 0; i < 3; i++){
+			midMatrix[i][0] = xRot[i][0] * yRot[0][0] + xRot[i][1] * yRot[1][0] + xRot[i][2] * yRot[2][0];
+			midMatrix[i][1] = xRot[i][0] * yRot[0][1] + xRot[i][1] * yRot[1][1] + xRot[i][2] * yRot[2][1];
 			midMatrix[i][2] = xRot[i][0] * yRot[0][2] + xRot[i][1] * yRot[1][2] + xRot[i][2] * yRot[2][2];
 		}
 		for(i = 0; i < 3; i++){
- 			newMatrix[i][0] = midMatrix[i][0] * zRot[0][0] + midMatrix[i][1] * zRot[1][0] + midMatrix[i][2] * zRot[2][0];
- 			newMatrix[i][1] = midMatrix[i][0] * zRot[0][1] + midMatrix[i][1] * zRot[1][1] + midMatrix[i][2] * zRot[2][1];
+			newMatrix[i][0] = midMatrix[i][0] * zRot[0][0] + midMatrix[i][1] * zRot[1][0] + midMatrix[i][2] * zRot[2][0];
+			newMatrix[i][1] = midMatrix[i][0] * zRot[0][1] + midMatrix[i][1] * zRot[1][1] + midMatrix[i][2] * zRot[2][1];
 			newMatrix[i][2] = midMatrix[i][0] * zRot[0][2] + midMatrix[i][1] * zRot[1][2] + midMatrix[i][2] * zRot[2][2];
 		}
 		return newMatrix;
