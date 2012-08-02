@@ -1,3 +1,5 @@
+// Added comment
+
 var transform = {
 	formSetup: function() {
 		var doc = document,
